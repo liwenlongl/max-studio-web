@@ -24,11 +24,6 @@ const routes = [
         component: () => import('../components/ScreenShare.vue')
       }
     ]
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/Login.vue')
   }
 ]
 
