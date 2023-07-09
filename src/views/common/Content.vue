@@ -1,15 +1,13 @@
 <template>
   <div class="content">
-    <transition>
-      <keep-alive>
-        <router-view></router-view>
-      </keep-alive>
-    </transition>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'Content',
   data () {
     return {
@@ -19,7 +17,7 @@ export default {
   methods: {
 
   }
-}
+})
 </script>
 
 <style scoped lang="scss">
@@ -30,6 +28,7 @@ export default {
   bottom: 0;
   left: 260px;
   padding: 10px 20px;
+  overflow-y: scroll;
 }
 
 :deep(.el-input) {

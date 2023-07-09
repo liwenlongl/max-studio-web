@@ -11,12 +11,14 @@ import Header from '@/views/common/Header.vue'
 import Sidebar from '@/views/common/Sidebar.vue'
 import Content from '@/views/common/Content.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'HomeView',
   components: {
     Header,
     Sidebar,
     Content
   }
-}
+})
 </script>

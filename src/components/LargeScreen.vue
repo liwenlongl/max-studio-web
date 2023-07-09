@@ -8,33 +8,23 @@
         maxlength="200"
         :clearable="true"
       >
-       <template #append>
-         <el-button :icon="Search"></el-button>
-       </template>
+        <template #append>
+          <el-button :icon="Search"></el-button>
+        </template>
       </el-input>
-      <el-button type="primary" plain :icon="Plus">添加</el-button>
+      <el-button type="primary" plain :icon="Plus" @click="screenAdd">添加</el-button>
     </div>
     <div class="screen-list">
-      <el-card v-for="screen in screenLists" :key="screen.id">
+      <el-card v-for="screen in screenLists" :key="screen.id"  @contextmenu="contextMenu($event, screen)">
         <img src="@/assets/image/homepage/charts.jpg">
         <div class="bg-info">
           <header>{{ screen.screenName }}</header>
           <footer>
             <span>{{ screen.currentStatus }}</span>
             <div class="operation">
-              <el-button :icon="View" type="text"></el-button>
-              <el-button :icon="Share" type="text"></el-button>
-              <el-dropdown trigger="click" placement="bottom-start">
-                <el-button :icon="Edit" type="text"></el-button>
-                <template v-slot:dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>重命名</el-dropdown-item>
-                    <el-dropdown-item>删除</el-dropdown-item>
-                    <el-dropdown-item>复制url</el-dropdown-item>
-                    <el-dropdown-item>配置项</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <el-button :icon="View" type="text" @click="pageJump(screen.accessAddress)"></el-button>
+              <el-button :icon="Share" type="text" @click="shareAdd"></el-button>
+              <el-button :icon="Edit" type="text" @click="screenUpdate(screen.id)"></el-button>
             </div>
           </footer>
         </div>
@@ -47,13 +37,23 @@
     <div class="paging">
       <el-pagination layout="prev, pager, next" background :total="pageNumber * 10" />
     </div>
+    <ShareDialog v-model:share-dialog-show="shareDialogShow" :share-form="shareForm"/>
+    <ScreenAdd v-model:screen-add-show="screenAddShow" :catalog-id="catalogId" :screen-list="getScreenList"/>
+    <ScreenUpdate v-model:screen-update-show="screenUpdateShow" :id="id" :screen-list="getScreenList"/>
   </div>
 </template>
 
 <script>
+import { defineComponent } from 'vue'
+import { ElMessage } from 'element-plus'
 import { Search, Plus, View, Share, Edit } from '@element-plus/icons-vue'
+import ShareDialog from '@/components/dialog/ShareDialog.vue'
+import ScreenAdd from '@/components/dialog/ScreenAdd.vue'
+import ScreenUpdate from '@/components/dialog/ScreenUpdate.vue'
+import { screenList, screenDelete, screenAdd, screenUpdate } from '@/request/api'
+import useClipboard from 'vue-clipboard3'
 
-export default {
+export default defineComponent({
   name: 'LargeScreen',
   data () {
     return {
@@ -64,95 +64,110 @@ export default {
       Edit,
       searchContent: '',
       pageNumber: 10,
-      screenLists: [
-        {
-          id: 1,
-          screenId: 1001,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 2,
-          screenId: 1002,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 3,
-          screenId: 1003,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 1,
-          screenId: 1004,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 5,
-          screenId: 1005,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 6,
-          screenId: 1006,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 7,
-          screenId: 1007,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 8,
-          screenId: 1008,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        },
-        {
-          id: 9,
-          screenId: 1009,
-          screenName: '智慧联动',
-          creator: 'liwenlong',
-          currentStatus: '使用中',
-          createTime: '2022-10-30',
-          accessAddress: 'http://lwl645123ab'
-        }
-      ]
+      shareDialogShow: false,
+      screenAddShow: false,
+      screenUpdateShow: false,
+      catalogId: null,
+      id: null,
+      shareForm: {
+        screenId: '',
+        screenName: '',
+        screenAddress: ''
+      },
+      screenLists: []
+    }
+  },
+  components: {
+    ScreenUpdate,
+    ShareDialog,
+    ScreenAdd
+  },
+  watch: {
+    $route () {
+      this.getScreenList()
     }
   },
   methods: {
+    contextMenu: function (e, screen) {
+      console.log(screen)
+      e.preventDefault()
+      this.$contextmenu({
+        x: e.x,
+        y: e.y,
+        items: [
+          {
+            label: '重名名',
+            onClick: () => {
 
+            }
+          },
+          {
+            label: '复制url',
+            onClick: () => {
+              const { toClipboard } = useClipboard()
+              const copy = async (Msg) => {
+                try {
+                  await toClipboard(Msg)
+                  console.log(Msg)
+                } catch (e) {
+                  console.error(e)
+                }
+              }
+              copy(screen.accessAddress)
+              ElMessage.success('复制成功')
+            }
+          },
+          {
+            label: '配置项',
+            onClick: () => {
+              alert('正在删除')
+            }
+          },
+          {
+            label: '删除',
+            onClick: () => {
+              console.log(screen)
+              screenDelete(screen.id).then(() => {
+                ElMessage.success('删除成功')
+                this.getScreenList()
+              }).catch(() => {
+                ElMessage.error('删除失败')
+              })
+            }
+          }
+        ]
+      })
+    },
+    getScreenList () {
+      const catalogId = this.$route.query.type
+      screenList(catalogId).then((res) => {
+        console.log(res)
+        this.screenLists = res.data
+        console.log(this.screenLists)
+      })
+    },
+    pageJump (url) {
+      window.open(url)
+    },
+    shareAdd (screen) {
+      this.shareForm.screenId = screen.screenId
+      this.shareForm.screenName = screen.screenName
+      this.shareAdd.screenAddress = screen.screenAddress
+      this.shareDialogShow = true
+    },
+    screenAdd () {
+      this.catalogId = this.$route.query.type // 当前路由的请求参数就是大屏的目录id
+      this.screenAddShow = true
+    },
+    screenUpdate (id) {
+      this.id = id
+      this.screenUpdateShow = true
+    }
+  },
+  created () {
+    this.getScreenList()
   }
-}
+})
 </script>
 
 <style scoped lang="scss">

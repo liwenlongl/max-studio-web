@@ -1,25 +1,20 @@
 <template>
   <div class="screen-share">
     <div class="share-header">
-      <el-icon><Refresh/></el-icon>
+      <el-icon @click="getShareList"><Refresh/></el-icon>
     </div>
     <div class="share-list">
-      <el-table :data="shareLists" style="width: 100%" max-height="250">
+      <el-table :data="shareLists">
         <el-table-column prop="id" label="分享记录" mix-width="80" />
         <el-table-column prop="screenName" label="大屏名称" mix-width="120" />
         <el-table-column prop="screenAddress" label="大屏url" mix-width="180" />
-        <el-table-column prop="shareTime" label="分享时间" mix-width="150" />
+        <el-table-column prop="createTime" label="分享时间" mix-width="150" />
         <el-table-column prop="expireTime" label="过期时间" mix-width="150" />
         <el-table-column fixed="right" label="操作" mix-width="120">
           <template #default="scope">
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click.prevent="deleteRow(scope.$index)"
-            >
-              删除
-            </el-button>
+            <el-button type="danger" size="small"
+              @click.prevent="deleteShareList(scope.row.id)"
+            >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -28,61 +23,43 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
-export default {
+import { shareList, shareDelete } from '@/request/api'
+import { ElMessage } from 'element-plus'
+
+export default defineComponent({
   name: 'ScreenShare',
   components: { Refresh },
   data () {
     return {
       Refresh,
-      shareLists: [
-        {
-          id: 1,
-          screenName: '智慧联动',
-          screenAddress: 'http://lwl645123.com',
-          shareTime: '2003-04-06',
-          expireTime: '2003-04-09'
-        },
-        {
-          id: 2,
-          screenName: '智慧联动',
-          screenAddress: 'http://lwl645123.com',
-          shareTime: '2003-04-06',
-          expireTime: '2003-04-09'
-        },
-        {
-          id: 3,
-          screenName: '智慧联动',
-          screenAddress: 'http://lwl645123.com',
-          shareTime: '2003-04-06',
-          expireTime: '2003-04-09'
-        },
-        {
-          id: 4,
-          screenName: '智慧联动',
-          screenAddress: 'http://lwl645123.com',
-          shareTime: '2003-04-06',
-          expireTime: '2003-04-09'
-        },
-        {
-          id: 5,
-          screenName: '智慧联动',
-          screenAddress: 'http://lwl645123.com',
-          shareTime: '2003-04-06',
-          expireTime: '2003-04-09'
-        }
-      ]
+      shareLists: []
     }
   },
   methods: {
-
+    getShareList () {
+      shareList().then((res) => {
+        this.shareLists = res.data
+      })
+    },
+    deleteShareList (id) {
+      shareDelete(id).then(() => {
+        ElMessage.success('删除成功')
+        this.getShareList()
+      }).catch(() => {
+        ElMessage.error('删除失败')
+      })
+    }
+  },
+  created () {
+    this.getShareList()
   }
-}
+})
 </script>
 
 <style scoped>
 .share-header {
-  height: 32px;
   margin-bottom: 20px;
 
   .el-icon {

@@ -11,7 +11,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'Header',
   data () {
     return {
@@ -20,7 +22,7 @@ export default {
   },
   methods: {
   }
-}
+})
 </script>
 
 <style scoped lang="scss">

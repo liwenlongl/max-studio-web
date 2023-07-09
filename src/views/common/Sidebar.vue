@@ -5,80 +5,57 @@
       router
       :default-active="activeIndex"
     >
-      <template v-for="navigation in navigations">
-        <template v-if="navigation.sublist">
-          <el-sub-menu :index="navigation.index" :key="navigation.index">
-            <template #title>
-              <span>{{ navigation.title}}</span>
-            </template>
-            <template v-for="subItem in navigation.sublist" :key="subItem.index">
-              <el-menu-item :index="subItem.index" :route="subItem.route">{{subItem.title}}</el-menu-item>
-            </template>
-          </el-sub-menu>
-        </template>
-        <template v-else>
-          <el-menu-item :index="navigation.index" :key="navigation.index">
-            <span>{{ navigation.title }}</span>
-          </el-menu-item>
-        </template>
-      </template>
+      <Menu :navigations="navigations" />
+      <el-menu-item index="share">
+        <span>我的分享</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+import { catalogList } from '@/request/api'
+import Menu from '@/views/components/Menu.vue'
+
+export default defineComponent({
   name: 'Sidebar',
   data () {
     return {
-      navigations: [
-        {
-          icon: 'fa-solid fa-hotel',
-          index: 'screen',
-          title: '大屏列表',
-          sublist: [
-            {
-              index: 'type1',
-              title: '业务分析大屏',
-              route: { name: 'screen', query: { type: 1 } }
-            },
-            {
-              index: 'type2',
-              title: '交通物流大屏',
-              route: { name: 'screen', query: { type: 2 } }
-            },
-            {
-              index: 'type3',
-              title: '数据监控大屏',
-              route: { name: 'screen', query: { type: 3 } }
-            },
-            {
-              index: 'type4',
-              title: '综合展示大屏',
-              route: { name: 'screen', query: { type: 4 } }
-            }
-          ]
-        },
-        {
-          icon: 'fa-solid fa-house-user',
-          index: 'share',
-          title: '我的分享'
-        }
-      ],
+      navigations: []
     }
   },
+  components: {
+    Menu
+  },
   methods: {
-
+    getCatalogList () {
+      catalogList().then((res) => {
+        this.navigations = res.data
+      })
+    }
   },
   computed: {
     activeIndex () {
-      return 'type' + String(this.$route.query.type)
+      // 记录路由信息，刷新时激活该路由对应的目录
+      return String(this.$route.query.type)
+    },
+    isRefresh () {
+      return this.$store.state.catalogRefresh
     }
+  },
+  watch: {
+    isRefresh () {
+      this.getCatalogList()
+    }
+  },
+  created () {
+    this.getCatalogList()
   }
-}
+})
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
   position: absolute;
   top: 82px;
@@ -87,9 +64,14 @@ export default {
   width: 199px;
   border-right: solid 1px #dcdfe6;
   padding: 0 30px;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .el-menu {
   border-right: initial;
 }
+
 </style>
