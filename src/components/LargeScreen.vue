@@ -9,7 +9,7 @@
         :clearable="true"
       >
         <template #append>
-          <el-button :icon="Search"></el-button>
+          <el-button :icon="Search" @click="getScreenSearch"></el-button>
         </template>
       </el-input>
       <el-button type="primary" plain :icon="Plus" @click="screenAdd">添加</el-button>
@@ -23,8 +23,8 @@
             <span>{{ screen.currentStatus }}</span>
             <div class="operation">
               <el-button :icon="View" type="text" @click="pageJump(screen.accessAddress)"></el-button>
-              <el-button :icon="Share" type="text" @click="shareAdd"></el-button>
-              <el-button :icon="Edit" type="text" @click="screenUpdate(screen.id)"></el-button>
+              <el-button :icon="Share" type="text" @click="shareScreen(screen)"></el-button>
+              <el-button :icon="Edit" type="text" @click="screenUpdate(screen)"></el-button>
             </div>
           </footer>
         </div>
@@ -34,12 +34,10 @@
         </div>
       </el-card>
     </div>
-    <div class="paging">
-      <el-pagination layout="prev, pager, next" background :total="pageNumber * 10" />
-    </div>
-    <ShareDialog v-model:share-dialog-show="shareDialogShow" :share-form="shareForm"/>
+    <ShareDialog v-model:share-dialog-show="shareDialogShow" :share-link="shareLink"/>
     <ScreenAdd v-model:screen-add-show="screenAddShow" :catalog-id="catalogId" :screen-list="getScreenList"/>
-    <ScreenUpdate v-model:screen-update-show="screenUpdateShow" :id="id" :screen-list="getScreenList"/>
+    <ScreenUpdate v-model:screen-update-show="screenUpdateShow" :id="id" :screen-list="getScreenList" />
+    <screen-rename v-model:screen-rename-show="screenRenameShow" :id="id" :screen-list="getScreenList" />
   </div>
 </template>
 
@@ -50,7 +48,8 @@ import { Search, Plus, View, Share, Edit } from '@element-plus/icons-vue'
 import ShareDialog from '@/components/dialog/ShareDialog.vue'
 import ScreenAdd from '@/components/dialog/ScreenAdd.vue'
 import ScreenUpdate from '@/components/dialog/ScreenUpdate.vue'
-import { screenList, screenDelete, screenAdd, screenUpdate } from '@/request/api'
+import ScreenRename from '@/components/dialog/ScreenRename.vue'
+import { screenList, screenDelete, screenSearch } from '@/request/api'
 import useClipboard from 'vue-clipboard3'
 
 export default defineComponent({
@@ -63,10 +62,11 @@ export default defineComponent({
       Share,
       Edit,
       searchContent: '',
-      pageNumber: 10,
       shareDialogShow: false,
+      shareLink: '',
       screenAddShow: false,
       screenUpdateShow: false,
+      screenRenameShow: false,
       catalogId: null,
       id: null,
       shareForm: {
@@ -78,6 +78,7 @@ export default defineComponent({
     }
   },
   components: {
+    ScreenRename,
     ScreenUpdate,
     ShareDialog,
     ScreenAdd
@@ -98,7 +99,8 @@ export default defineComponent({
           {
             label: '重名名',
             onClick: () => {
-
+              this.id = screen.id
+              this.screenRenameShow = true
             }
           },
           {
@@ -120,7 +122,7 @@ export default defineComponent({
           {
             label: '配置项',
             onClick: () => {
-              alert('正在删除')
+              ElMessage.info('该功能还未上线，敬请期待')
             }
           },
           {
@@ -147,21 +149,37 @@ export default defineComponent({
       })
     },
     pageJump (url) {
-      window.open(url)
+      window.location.href = url
     },
-    shareAdd (screen) {
-      this.shareForm.screenId = screen.screenId
+    shareScreen (screen) {
+      this.shareForm.screenId = screen.id
       this.shareForm.screenName = screen.screenName
-      this.shareAdd.screenAddress = screen.screenAddress
+      this.shareForm.screenAddress = screen.accessAddress
+      this.shareLink = screen.accessAddress
       this.shareDialogShow = true
     },
     screenAdd () {
       this.catalogId = this.$route.query.type // 当前路由的请求参数就是大屏的目录id
+      console.log(this.catalogId)
       this.screenAddShow = true
     },
-    screenUpdate (id) {
-      this.id = id
+    screenUpdate () {
       this.screenUpdateShow = true
+    },
+    getScreenSearch () {
+      if (this.searchContent === '') {
+        ElMessage.error('请先输入大屏名称')
+      } else {
+        screenSearch(this.searchContent).then((res) => {
+          if (res.data.length === 0) {
+            ElMessage.info('搜索内容为空')
+          } else {
+            this.screenLists = res.data
+          }
+        }).catch(() => {
+          ElMessage.error('搜索失败')
+        })
+      }
     }
   },
   created () {
