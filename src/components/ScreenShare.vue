@@ -58,7 +58,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .share-header {
   margin-bottom: 20px;
 
