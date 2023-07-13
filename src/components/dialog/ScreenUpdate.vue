@@ -13,7 +13,7 @@
           <el-input v-model="screenForm.creator" clearable></el-input>
         </el-form-item>
         <el-form-item label="大屏状态" prop="currentStatus">
-          <el-select v-model="screenForm.currentStatus" placeholder="请选择支付状态">
+          <el-select v-model="screenForm.currentStatus" placeholder="请选择大屏状态">
             <el-option label="使用中" value="1"></el-option>
             <el-option label="开发中" value="2"></el-option>
             <el-option label="测试中" value="3"></el-option>
@@ -100,6 +100,7 @@ export default defineComponent({
     screenUpdateConfirm () {
       this.$refs.screenForm.validate((valid) => {
         const obj = this.screenForm
+        console.log(obj)
         screenUpdate(obj).then(() => {
           ElMessage.success('修改成功')
           this.screenListRefresh()
