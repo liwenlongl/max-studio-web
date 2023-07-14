@@ -1,0 +1,58 @@
+{
+  "id": "4166876",
+  "name": "MaxStudio",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-iconfont-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "10352344",
+      "name": "重命名",
+      "font_class": "zhongmingming1",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "11372665",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e8b0",
+      "unicode_decimal": 59568
+    },
+    {
+      "icon_id": "1348256",
+      "name": "新建",
+      "font_class": "xinjian",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "2076418",
+      "name": "修改",
+      "font_class": "xiugai",
+      "unicode": "e8cf",
+      "unicode_decimal": 59599
+    },
+    {
+      "icon_id": "3538379",
+      "name": "删除",
+      "font_class": "shanchu",
+      "unicode": "e718",
+      "unicode_decimal": 59160
+    },
+    {
+      "icon_id": "6512221",
+      "name": "新建",
+      "font_class": "xinjian1",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "23081216",
+      "name": "重命名",
+      "font_class": "zhongmingming",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    }
+  ]
+}

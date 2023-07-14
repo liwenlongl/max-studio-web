@@ -58,6 +58,7 @@ export default defineComponent({
         items: [
           {
             label: '重名名',
+            icon: 'icon-iconfont-zhongmingming',
             onClick: () => {
               this.id = navigation.id
               this.catalogUpdateShow = true
@@ -65,6 +66,7 @@ export default defineComponent({
           },
           {
             label: '新建目录',
+            icon: 'icon-iconfont-xinjian',
             onClick: () => {
               this.pid = navigation.parentId
               this.catalogAddShow = true
@@ -72,6 +74,7 @@ export default defineComponent({
           },
           {
             label: '删除目录',
+            icon: 'icon-iconfont-shanchu',
             onClick: () => {
               catalogDelete(navigation.id).then(() => {
                 this.$store.commit('set_catalogRefresh')
@@ -83,6 +86,7 @@ export default defineComponent({
           },
           {
             label: '新建子目录',
+            icon: 'icon-iconfont-xinjian1',
             onClick: () => {
               console.log(navigation)
               this.pid = navigation.id

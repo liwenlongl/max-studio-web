@@ -100,6 +100,7 @@ export default defineComponent({
         items: [
           {
             label: '重名名',
+            icon: 'icon-iconfont-zhongmingming',
             onClick: () => {
               this.id = screen.id
               this.screenRenameShow = true
@@ -107,6 +108,7 @@ export default defineComponent({
           },
           {
             label: '复制url',
+            icon: 'icon-iconfont-fuzhi',
             onClick: () => {
               const { toClipboard } = useClipboard()
               const copy = async (Msg) => {
@@ -123,12 +125,14 @@ export default defineComponent({
           },
           {
             label: '配置项',
+            icon: 'icon-iconfont-xiugai',
             onClick: () => {
               ElMessage.info('该功能还未上线，敬请期待')
             }
           },
           {
             label: '删除',
+            icon: 'icon-iconfont-shanchu',
             onClick: () => {
               console.log(screen)
               screenDelete(screen.id).then(() => {
@@ -281,5 +285,11 @@ footer {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.el-input-group__append .el-button {
+  &:hover {
+    background-color: #a0cfff;
+  }
 }
 </style>
