@@ -16,6 +16,8 @@ export const screenList = (params) => get('/screen/list/' + String(params))
 
 export const screenUpdate = (params) => put('/screen/update', params)
 
+export const screenSearch = (params) => get('/screen/search?name=' + params)
+
 export const shareList = () => get('/share/list')
 
 export const shareDelete = (params) => axiosDelete('/share/delete?id=' + params)
