@@ -85,7 +85,9 @@ export default defineComponent({
   },
   watch: {
     $route () {
-      this.getScreenList()
+      if (this.$route.name !== 'share') {
+        this.getScreenList()
+      }
     }
   },
   methods: {
@@ -149,7 +151,7 @@ export default defineComponent({
       })
     },
     pageJump (url) {
-      window.location.href = url
+      window.open(url)
     },
     shareScreen (screen) {
       this.shareForm.screenId = screen.id
